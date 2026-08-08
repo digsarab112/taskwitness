@@ -80,6 +80,7 @@ export function renderHtmlReport(report: VerificationReport): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23142019'/%3E%3Cpath d='M17 33l10 10 21-23' fill='none' stroke='%2335ce7b' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>TaskWitness — ${escapeHtml(report.verdict)}</title>
   <style>${styles}</style>
 </head>

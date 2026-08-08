@@ -18,6 +18,7 @@ describe('Proof Pack renderers', () => {
     assert.ok(!html.includes('<script>alert(1)</script>'));
     assert.match(html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/u);
     assert.match(html, /color-scheme/u);
+    assert.match(html, /<link rel="icon" href="data:image\/svg\+xml,/u);
     assert.ok(!html.includes('<script'));
   });
 
@@ -102,7 +103,7 @@ function sampleReport(): VerificationReport {
     ],
     warnings: [],
     generatedAt: now,
-    taskWitnessVersion: '0.1.0',
+    taskWitnessVersion: '0.1.1',
     repository: {
       root: '/fixture',
       branchAtStart: 'main',

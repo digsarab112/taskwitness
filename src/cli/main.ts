@@ -15,6 +15,7 @@ import {
   type CheckDefinition,
   type CheckResult,
   type TaskContract,
+  type Verdict,
   type VerificationReport,
 } from '../domain/schemas.js';
 import { GitRepository } from '../git/repository.js';
@@ -221,6 +222,13 @@ async function runVerify(options: VerifyOptions): Promise<void> {
   else if (options.markdown) console.log(renderMarkdownReport(report));
   else if (options.html) console.log(paths.html);
   else console.log(renderTerminalReport(report));
+  process.exitCode = exitCodeForVerdict(report.verdict);
+}
+
+export function exitCodeForVerdict(verdict: Verdict): 0 | 1 | 2 {
+  if (verdict === 'VERIFIED') return 0;
+  if (verdict === 'VERIFICATION_FAILED') return 1;
+  return 2;
 }
 
 async function runReport(options: ReportOptions): Promise<void> {

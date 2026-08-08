@@ -53,6 +53,12 @@ export async function analyzeVerification(
     session.baseline.checkResults,
     verificationChecks,
   );
+  const scopeIntegrityEvidence = addScopeIntegrityEvidence(
+    factory,
+    changes,
+    verificationChecks,
+    regression.hasNewRegression,
+  );
   const preExistingTestEvidence = addPreExistingRelevantTestEvidence(
     factory,
     session.contract.requirements,
@@ -68,6 +74,7 @@ export async function analyzeVerification(
     checkEvidence,
     regressionEvidence: regression.records,
     preExistingTestEvidence,
+    scopeIntegrityEvidence,
     verificationChecks,
     baselineChecks: session.baseline.checkResults,
     compromisedTests,
@@ -278,6 +285,48 @@ function addRegressionEvidence(
   return { records, hasNewRegression: records.length > 0 };
 }
 
+function addScopeIntegrityEvidence(
+  factory: EvidenceFactory,
+  changes: readonly FileChange[],
+  checks: readonly CheckResult[],
+  hasNewRegression: boolean,
+): EvidenceRecord | undefined {
+  const unexpectedChanges = changes.filter(
+    (change) =>
+      change.classification === 'OUT_OF_SCOPE' ||
+      change.classification === 'HIGH_RISK_OUT_OF_SCOPE',
+  );
+  const allChecksPassed =
+    checks.length > 0 && checks.every((check) => check.status === 'passed');
+  if (
+    changes.length === 0 ||
+    unexpectedChanges.length > 0 ||
+    hasNewRegression ||
+    !allChecksPassed
+  ) {
+    return undefined;
+  }
+
+  return factory.add({
+    type: 'repository_state',
+    source: 'complete baseline-to-verification Git diff and approved checks',
+    result: 'passed',
+    strength: 2,
+    summary: `The complete Git diff contains no unexpected or high-risk change, and all ${checks.length} approved check(s) passed.`,
+    details: {
+      changedFiles: changes.map((change) => change.path),
+      classifications: changes.map((change) => ({
+        path: change.path,
+        classification: change.classification,
+      })),
+      passedChecks: checks.map((check) => check.checkId),
+      newRegressions: 0,
+    },
+    relatedFiles: changes.map((change) => change.path),
+    independent: true,
+  });
+}
+
 function addPreExistingRelevantTestEvidence(
   factory: EvidenceFactory,
   requirements: readonly Requirement[],
@@ -323,6 +372,7 @@ type MappingInput = {
   checkEvidence: ReadonlyMap<string, EvidenceRecord>;
   regressionEvidence: readonly EvidenceRecord[];
   preExistingTestEvidence: ReadonlyMap<string, EvidenceRecord>;
+  scopeIntegrityEvidence: EvidenceRecord | undefined;
   verificationChecks: readonly CheckResult[];
   baselineChecks: readonly CheckResult[];
   compromisedTests: boolean;
@@ -379,6 +429,37 @@ function mapRequirements(input: MappingInput): RequirementFinding[] {
       };
     }
 
+    if (
+      (requirement.kind === 'constraint' || requirement.kind === 'safety') &&
+      input.scopeIntegrityEvidence !== undefined
+    ) {
+      return {
+        requirementId: requirement.id,
+        text: requirement.text,
+        status: 'VERIFIED',
+        strength: 2,
+        evidenceIds: [...evidenceIds, input.scopeIntegrityEvidence.id],
+        explanation:
+          'The complete Git diff contains no unexpected or high-risk scope drift, every approved check passed, and no baseline regression was introduced.',
+      };
+    }
+
+    const existingTest = input.preExistingTestEvidence.get(requirement.id);
+    if (existingTest !== undefined && passedTest !== undefined && !input.compromisedTests) {
+      const passedEvidence = input.checkEvidence.get(passedTest.checkId);
+      if (passedEvidence !== undefined) {
+        return {
+          requirementId: requirement.id,
+          text: requirement.text,
+          status: 'VERIFIED',
+          strength: 2,
+          evidenceIds: [...evidenceIds, existingTest.id, passedEvidence.id],
+          explanation:
+            'An unchanged pre-existing relevant test is backed by an approved passing test run.',
+        };
+      }
+    }
+
     if (relevantChanges.length === 0) {
       if (requirement.kind === 'constraint' || requirement.kind === 'preservation') {
         const scopeEvidence = input.warningEvidence.filter(
@@ -420,22 +501,6 @@ function mapRequirements(input: MappingInput): RequirementFinding[] {
         explanation:
           'Relevant implementation evidence exists, but an approved verification check failed.',
       };
-    }
-
-    const existingTest = input.preExistingTestEvidence.get(requirement.id);
-    if (existingTest !== undefined && passedTest !== undefined && !input.compromisedTests) {
-      const passedEvidence = input.checkEvidence.get(passedTest.checkId);
-      if (passedEvidence !== undefined) {
-        return {
-          requirementId: requirement.id,
-          text: requirement.text,
-          status: 'VERIFIED',
-          strength: 2,
-          evidenceIds: [...evidenceIds, existingTest.id, passedEvidence.id],
-          explanation:
-            'Relevant static changes are backed by an approved passing test run and unchanged pre-existing test evidence.',
-        };
-      }
     }
 
     if (

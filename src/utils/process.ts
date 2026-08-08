@@ -1,5 +1,5 @@
-import { spawn } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
+import crossSpawn from 'cross-spawn';
 import { redactSecrets } from '../security/redact.js';
 import { truncateUtf8 } from './text.js';
 
@@ -27,10 +27,11 @@ export async function runProcess(
   options: ProcessOptions,
 ): Promise<ProcessResult> {
   const started = performance.now();
-  const platformExecutable = resolvePlatformExecutable(executable);
-
   return new Promise((resolve) => {
-    const child = spawn(platformExecutable, [...args], {
+    // Node cannot execute Windows .cmd shims such as npm.cmd directly with
+    // shell:false. cross-spawn resolves and safely escapes those shims while
+    // preserving argv-based execution on every platform.
+    const child = crossSpawn(executable, [...args], {
       cwd: options.cwd,
       env: options.env ?? process.env,
       shell: false,
@@ -59,8 +60,8 @@ export async function runProcess(
       else stderrBytes += Math.min(chunk.length, remaining);
     };
 
-    child.stdout.on('data', (chunk: Buffer) => collect(stdoutChunks, chunk, 'stdout'));
-    child.stderr.on('data', (chunk: Buffer) => collect(stderrChunks, chunk, 'stderr'));
+    child.stdout?.on('data', (chunk: Buffer) => collect(stdoutChunks, chunk, 'stdout'));
+    child.stderr?.on('data', (chunk: Buffer) => collect(stderrChunks, chunk, 'stderr'));
     child.on('error', (error) => {
       spawnError = error.message;
     });
@@ -92,14 +93,4 @@ export async function runProcess(
       resolve(result);
     });
   });
-}
-
-function resolvePlatformExecutable(executable: string): string {
-  if (
-    process.platform === 'win32' &&
-    ['npm', 'npx', 'pnpm', 'yarn', 'bun'].includes(executable.toLowerCase())
-  ) {
-    return `${executable}.cmd`;
-  }
-  return executable;
 }

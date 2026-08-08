@@ -52,7 +52,7 @@ classification.
 Every new ecosystem adapter should include:
 
 1. detection tests;
-2. command construction tests without a shell;
+2. argv construction and shell-operator rejection tests;
 3. baseline/after comparison tests;
 4. Windows-safe path tests;
 5. an honest unsupported-case test.

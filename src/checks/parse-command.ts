@@ -4,27 +4,36 @@ export function parseCommand(command: string): { executable: string; args: strin
   const tokens: string[] = [];
   let current = '';
   let quote: 'single' | 'double' | null = null;
-  let escaping = false;
+  let tokenStarted = false;
+  const input = command.trim();
 
-  for (const character of command.trim()) {
-    if (escaping) {
-      current += character;
-      escaping = false;
-      continue;
-    }
-
+  for (let index = 0; index < input.length; index += 1) {
+    const character = input[index];
+    if (character === undefined) continue;
     if (character === '\\' && quote !== 'single') {
-      escaping = true;
+      const next = input[index + 1];
+      if (next !== undefined && isEscapable(next, quote)) {
+        current += next;
+        tokenStarted = true;
+        index += 1;
+      } else {
+        // Backslashes are ordinary path characters on Windows. Preserve them
+        // unless they unambiguously escape syntax understood by this parser.
+        current += character;
+        tokenStarted = true;
+      }
       continue;
     }
 
     if (character === "'" && quote !== 'double') {
       quote = quote === 'single' ? null : 'single';
+      tokenStarted = true;
       continue;
     }
 
     if (character === '"' && quote !== 'single') {
       quote = quote === 'double' ? null : 'double';
+      tokenStarted = true;
       continue;
     }
 
@@ -33,20 +42,33 @@ export function parseCommand(command: string): { executable: string; args: strin
     }
 
     if (/\s/u.test(character) && quote === null) {
-      if (current.length > 0) {
+      if (tokenStarted) {
         tokens.push(current);
         current = '';
+        tokenStarted = false;
       }
       continue;
     }
 
     current += character;
+    tokenStarted = true;
   }
 
-  if (escaping || quote !== null)
-    throw new Error('Unterminated escape or quote in command.');
-  if (current.length > 0) tokens.push(current);
+  if (quote !== null) throw new Error('Unterminated quote in command.');
+  if (tokenStarted) tokens.push(current);
   const [executable, ...args] = tokens;
-  if (executable === undefined) throw new Error('Verification command cannot be empty.');
+  if (executable === undefined || executable.length === 0) {
+    throw new Error('Verification command cannot be empty.');
+  }
   return { executable, args };
+}
+
+function isEscapable(character: string, quote: 'double' | null): boolean {
+  if (quote === 'double') return character === '"';
+  return (
+    /\s/u.test(character) ||
+    character === '"' ||
+    character === "'" ||
+    [';', '&', '|', '>', '<', '`'].includes(character)
+  );
 }

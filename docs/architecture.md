@@ -16,8 +16,9 @@ testable modules:
    without changing the user's index or creating a commit.
 2. **Session store** records the approved Task Contract, baseline metadata, detected checks,
    and baseline results under `.taskwitness/`.
-3. **Check adapters** detect Node.js and Python checks. The runner executes an argv array
-   without a shell, only after approval, with a timeout and bounded/redacted output.
+3. **Check adapters** detect Node.js and Python checks. The runner executes a parsed argv array,
+   only after approval, with a timeout and bounded/redacted output. Windows `.cmd` shims use an
+   argv-aware launcher instead of raw command interpolation.
 4. **Evidence engine** converts Git facts, check results, regressions, and integrity warnings
    into schema-validated evidence records with stable IDs.
 5. **Analyzers** map deterministic evidence to requirements and classify scope drift. A
@@ -66,6 +67,11 @@ The Phase 1 CLI is intentionally conservative. A passing generic build supports 
 does not prove a feature. A passing check can verify a requirement only when TaskWitness can
 connect it to independent, relevant test evidence.
 
+For negative scope and safety constraints, the complete baseline-to-verification Git diff is itself
+relevant evidence: TaskWitness may verify the constraint only when every changed file is classified
+as expected/supporting/beneficial, every approved check passes, and no baseline regression exists.
+This does not prove semantic equivalence of unrelated runtime behavior.
+
 ## Verdict policy
 
 - `VERIFICATION_FAILED`: a requirement failed or a new baseline regression was introduced.
@@ -89,8 +95,8 @@ heuristic and is never described as perfect. `.env` files, private keys, common 
 binary files, generated directories, and oversized content are excluded from provider context.
 
 Approved checks still execute repository code and are therefore dangerous. Phase 1 displays
-commands, never uses a shell, applies timeouts/output limits, and requires approval unless the
-command is explicitly trusted in configuration. Isolation is future work.
+commands, rejects shell operators, uses parsed argv, applies timeouts/output limits, and requires
+approval unless the command is explicitly trusted in configuration. Isolation is future work.
 
 ## Phase 1 acceptance criteria
 
