@@ -1,0 +1,77 @@
+{
+  "name": "taskwitness",
+  "version": "0.1.0",
+  "description": "Evidence-backed completion reports for AI coding agents.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "taskwitness": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build:test && node --test .test-dist/tests/*.test.js",
+    "build:test": "tsc -p tsconfig.test.json",
+    "demo": "npm run build && node demo/run-demo.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run check"
+  },
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "verification",
+    "git",
+    "cli",
+    "evidence"
+  ],
+  "author": {
+    "name": "digsarab112 and TaskWitness contributors",
+    "url": "https://github.com/digsarab112"
+  },
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digsarab112/taskwitness.git"
+  },
+  "bugs": {
+    "url": "https://github.com/digsarab112/taskwitness/issues"
+  },
+  "homepage": "https://github.com/digsarab112/taskwitness#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "commander": "^14.0.0",
+    "picocolors": "^1.1.1",
+    "yaml": "^2.8.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "eslint": "^9.33.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.1"
+  }
+}

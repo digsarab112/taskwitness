@@ -1,0 +1,70 @@
+
+TASKWITNESS REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TASK
+Add Google login without changing existing email/password login
+
+VERDICT
+✕ VERIFICATION FAILED
+
+0 / 3 requirements verified
+• 1 requirement(s) have contradictory evidence.
+
+REQUIREMENTS
+──────────────────────────────────────────────────────────
+
+⚠ REVIEW REQUIRED R1 Google login must be implemented and present in the repository.
+The implementation is present, but pre-existing tests changed, weakening independence.
+  Evidence
+  • EV-001 added src/auth/google-login.js
+  • EV-004 1 pre-existing test file(s) were modified, deleted, or renamed.
+
+⚠ REVIEW REQUIRED R2 Existing email/password login must remain functional and must not be weakened.
+The implementation is present, but pre-existing tests changed, weakening independence.
+  Evidence
+  • EV-001 added src/auth/google-login.js
+  • EV-002 modified src/auth/password.js
+  • EV-003 modified test/password.test.js
+  • EV-004 1 pre-existing test file(s) were modified, deleted, or renamed.
+
+✕ FAILED R3 No unrelated high-risk security or access-control change may be introduced.
+A security-sensitive change contradicts this scope constraint.
+  Evidence
+  • EV-001 added src/auth/google-login.js
+  • EV-002 modified src/auth/password.js
+  • EV-003 modified test/password.test.js
+  • EV-005 High-risk unexpected change: src/auth/password.js
+
+WHAT CHANGED
+──────────────────────────────────────────────────────────
+
+3 files  +5  -2
+1 added · 2 modified · 0 deleted · 0 renamed
+
+✓ src/auth/google-login.js (added)
+🚨 src/auth/password.js (modified)
+• test/password.test.js (modified)
+
+VERIFICATION
+──────────────────────────────────────────────────────────
+
+✓ Tests npm run test — 1 passed, 0 failed, 0 skipped
+
+WHAT NEEDS HUMAN ATTENTION
+──────────────────────────────────────────────────────────
+
+⚠ TEST INTEGRITY WARNING
+Passing results from changed pre-existing tests should not be treated as fully independent proof.
+  • test/password.test.js
+
+🚨 HIGH-RISK OUT-OF-SCOPE CHANGE
+A password minimum appears to decrease from 12 to 6.
+  • src/auth/password.js
+
+FINAL
+──────────────────────────────────────────────────────────
+
+NOT READY FOR ACCEPTANCE
+
+Proof Pack: .taskwitness/reports/20260808171234-bb591721/

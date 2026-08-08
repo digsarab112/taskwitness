@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>TaskWitness — VERIFICATION_FAILED</title>
+    <style>
+      :root {
+        --bg: #f4f7f3;
+        --surface: #fff;
+        --surface2: #edf2ed;
+        --text: #142019;
+        --muted: #68746c;
+        --line: #dae2db;
+        --green: #35ce7b;
+        --greenInk: #07512c;
+        --blue: #3d71f3;
+        --yellow: #d99b21;
+        --red: #df4a4a;
+        --shadow: 0 20px 65px rgba(20, 45, 28, 0.08);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0c110e;
+          --surface: #141a16;
+          --surface2: #1b231e;
+          --text: #edf5ef;
+          --muted: #9ba79f;
+          --line: #2a352e;
+          --green: #50dc91;
+          --greenInk: #aaf2c8;
+          --blue: #80a4ff;
+          --yellow: #ffd16f;
+          --red: #ff8181;
+          --shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        line-height: 1.55;
+      }
+      main {
+        width: min(1080px, calc(100% - 32px));
+        margin: auto;
+      }
+      header {
+        height: 84px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .brand {
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        color: var(--text);
+      }
+      .brand b {
+        color: var(--green);
+      }
+      section {
+        margin: 78px 0;
+      }
+      .hero {
+        margin-top: 0;
+        padding: 65px 0 48px;
+      }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-size: 10px;
+        font-weight: 850;
+        color: var(--muted);
+        margin-bottom: 11px;
+      }
+      h1 {
+        font-size: clamp(35px, 5vw, 64px);
+        line-height: 1.06;
+        letter-spacing: -0.045em;
+        max-width: 900px;
+        margin: 19px 0 25px;
+      }
+      h2 {
+        font-size: 29px;
+        letter-spacing: -0.035em;
+        margin: 0 0 24px;
+      }
+      .verdict,
+      .status,
+      .classification {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        font-weight: 850;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .verdict {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .verdict-verified,
+      .status-verified {
+        background: color-mix(in srgb, var(--green) 17%, transparent);
+        color: var(--greenInk);
+      }
+      .verdict-needs-review,
+      .verdict-insufficient-evidence,
+      .status-unverified,
+      .status-human-review-required {
+        background: color-mix(in srgb, var(--yellow) 15%, transparent);
+        color: var(--yellow);
+      }
+      .verdict-verification-failed,
+      .status-failed {
+        background: color-mix(in srgb, var(--red) 15%, transparent);
+        color: var(--red);
+      }
+      .status-supported {
+        background: color-mix(in srgb, var(--blue) 14%, transparent);
+        color: var(--blue);
+      }
+      .reason-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .reason-row span {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 7px 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+      .metrics div {
+        padding: 23px;
+        border-right: 1px solid var(--line);
+      }
+      .metrics div:last-child {
+        border: 0;
+      }
+      .metrics strong {
+        display: block;
+        font-size: 28px;
+        letter-spacing: -0.04em;
+      }
+      .metrics span {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .plus {
+        color: var(--green);
+      }
+      .minus {
+        color: var(--red);
+      }
+      .requirements,
+      .checks,
+      .warning-grid {
+        display: grid;
+        gap: 12px;
+      }
+      .requirement {
+        padding: 22px 24px;
+        border-radius: 15px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+      }
+      .requirement-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .status {
+        font-size: 9px;
+        padding: 5px 8px;
+      }
+      .proof {
+        font-size: 10px;
+        color: var(--muted);
+      }
+      .requirement h3 {
+        font-size: 17px;
+        margin: 17px 0 6px;
+      }
+      .requirement h3 small {
+        font-size: 10px;
+        color: var(--muted);
+        margin-right: 8px;
+      }
+      .requirement p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .evidence {
+        margin-top: 17px;
+        padding-top: 15px;
+        border-top: 1px solid var(--line);
+        font-size: 11px;
+      }
+      .evidence strong {
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 9px;
+        color: var(--muted);
+      }
+      .evidence ul {
+        margin: 7px 0 0;
+        padding-left: 18px;
+      }
+      .evidence em {
+        display: block;
+        margin-top: 7px;
+        color: var(--muted);
+      }
+      code {
+        font-family: 'SFMono-Regular', Consolas, monospace;
+      }
+      .table-wrap {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      th {
+        background: var(--surface2);
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 9px;
+      }
+      tr:last-child td {
+        border: 0;
+      }
+      .classification {
+        padding: 4px 7px;
+        font-size: 8px;
+        background: var(--surface2);
+        color: var(--muted);
+      }
+      .class-high-risk-out-of-scope {
+        color: var(--red);
+      }
+      .class-out-of-scope {
+        color: var(--yellow);
+      }
+      .class-expected {
+        color: var(--greenInk);
+      }
+      .lines {
+        white-space: nowrap;
+      }
+      .check {
+        display: grid;
+        grid-template-columns: 32px 1fr auto;
+        gap: 11px;
+        align-items: center;
+        padding: 15px 17px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .check-icon {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        font-weight: 900;
+      }
+      .check-pass .check-icon {
+        color: var(--green);
+        background: color-mix(in srgb, var(--green) 17%, transparent);
+      }
+      .check-fail .check-icon {
+        color: var(--red);
+        background: color-mix(in srgb, var(--red) 15%, transparent);
+      }
+      .check code {
+        display: block;
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .check > span:last-child {
+        font-size: 9px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .empty {
+        padding: 20px;
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        color: var(--muted);
+      }
+      .warning {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 10px;
+        padding: 19px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 13px;
+      }
+      .warning-high {
+        border-color: color-mix(in srgb, var(--red) 45%, var(--line));
+      }
+      .warning h3 {
+        margin: 0;
+        font-size: 13px;
+      }
+      .warning p {
+        margin: 4px 0 9px;
+        color: var(--muted);
+      }
+      .warning code {
+        display: block;
+        font-size: 10px;
+      }
+      .limitations {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 35px;
+        padding: 31px;
+        background: var(--surface2);
+        border: 1px solid var(--line);
+        border-radius: 17px;
+      }
+      .limitations ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+      .limitations li {
+        margin: 7px 0;
+      }
+      footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 34px 0 50px;
+        border-top: 1px solid var(--line);
+        font-size: 11px;
+        color: var(--muted);
+      }
+      @media (max-width: 700px) {
+        section {
+          margin: 55px 0;
+        }
+        .metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+        .metrics div:nth-child(2) {
+          border-right: 0;
+        }
+        .metrics div:nth-child(-n + 2) {
+          border-bottom: 1px solid var(--line);
+        }
+        .limitations {
+          grid-template-columns: 1fr;
+        }
+        .check {
+          grid-template-columns: 30px 1fr;
+        }
+        .check > span:last-child {
+          display: none;
+        }
+        footer {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="brand">TASK<b>WITNESS</b></span
+        ><span>Aug 8, 2026, 8:12 PM</span>
+      </header>
+      <section class="hero">
+        <div class="eyebrow">Evidence-backed completion report</div>
+        <div class="verdict verdict-verification-failed">× VERIFICATION FAILED</div>
+        <h1>Add Google login without changing existing email/password login</h1>
+        <div class="reason-row">
+          <span>1 requirement(s) have contradictory evidence.</span>
+        </div>
+      </section>
+      <section class="metrics">
+        <div><strong>0/3</strong><span>requirements verified</span></div>
+        <div><strong>3</strong><span>files changed</span></div>
+        <div><strong class="plus">+5</strong><span>lines added</span></div>
+        <div><strong class="minus">-2</strong><span>lines removed</span></div>
+      </section>
+      <section>
+        <div class="eyebrow">Task Contract</div>
+        <h2>Requirements</h2>
+        <div class="requirements">
+          <article class="requirement">
+            <div class="requirement-head">
+              <span class="status status-human-review-required"
+                >! HUMAN REVIEW REQUIRED</span
+              >
+              <span class="proof">proof 1/3</span>
+            </div>
+            <h3>
+              <small>R1</small>Google login must be implemented and present in the
+              repository.
+            </h3>
+            <p>
+              The implementation is present, but pre-existing tests changed, weakening
+              independence.
+            </p>
+            <div class="evidence">
+              <strong>Evidence</strong>
+              <ul>
+                <li><code>EV-001</code> added src/auth/google-login.js</li>
+                <li>
+                  <code>EV-004</code> 1 pre-existing test file(s) were modified, deleted, or
+                  renamed.
+                </li>
+              </ul>
+            </div>
+          </article>
+          <article class="requirement">
+            <div class="requirement-head">
+              <span class="status status-human-review-required"
+                >! HUMAN REVIEW REQUIRED</span
+              >
+              <span class="proof">proof 1/3</span>
+            </div>
+            <h3>
+              <small>R2</small>Existing email/password login must remain functional and must
+              not be weakened.
+            </h3>
+            <p>
+              The implementation is present, but pre-existing tests changed, weakening
+              independence.
+            </p>
+            <div class="evidence">
+              <strong>Evidence</strong>
+              <ul>
+                <li><code>EV-001</code> added src/auth/google-login.js</li>
+                <li><code>EV-002</code> modified src/auth/password.js</li>
+                <li><code>EV-003</code> modified test/password.test.js</li>
+                <li>
+                  <code>EV-004</code> 1 pre-existing test file(s) were modified, deleted, or
+                  renamed.
+                </li>
+              </ul>
+            </div>
+          </article>
+          <article class="requirement">
+            <div class="requirement-head">
+              <span class="status status-failed">× FAILED</span>
+              <span class="proof">proof 1/3</span>
+            </div>
+            <h3>
+              <small>R3</small>No unrelated high-risk security or access-control change may
+              be introduced.
+            </h3>
+            <p>A security-sensitive change contradicts this scope constraint.</p>
+            <div class="evidence">
+              <strong>Evidence</strong>
+              <ul>
+                <li><code>EV-001</code> added src/auth/google-login.js</li>
+                <li><code>EV-002</code> modified src/auth/password.js</li>
+                <li><code>EV-003</code> modified test/password.test.js</li>
+                <li>
+                  <code>EV-005</code> High-risk unexpected change: src/auth/password.js
+                </li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section>
+        <div class="eyebrow">Observable facts</div>
+        <h2>What changed</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Change</th>
+                <th>Classification</th>
+                <th>Lines</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>src/auth/google-login.js</code></td>
+                <td>added</td>
+                <td><span class="classification class-expected">EXPECTED</span></td>
+                <td class="lines">
+                  <span class="plus">+3</span> <span class="minus">-0</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>src/auth/password.js</code></td>
+                <td>modified</td>
+                <td>
+                  <span class="classification class-high-risk-out-of-scope"
+                    >HIGH RISK OUT OF SCOPE</span
+                  >
+                </td>
+                <td class="lines">
+                  <span class="plus">+1</span> <span class="minus">-1</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>test/password.test.js</code></td>
+                <td>modified</td>
+                <td><span class="classification class-supporting">SUPPORTING</span></td>
+                <td class="lines">
+                  <span class="plus">+1</span> <span class="minus">-1</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section>
+        <div class="eyebrow">Approved execution</div>
+        <h2>Verification</h2>
+        <div class="checks">
+          <div class="check check-pass">
+            <span class="check-icon">✓</span>
+            <div><strong>Tests</strong><code>npm run test</code></div>
+            <span>passed</span>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="eyebrow">Human attention</div>
+        <h2>Things worth checking</h2>
+        <div class="warning-grid">
+          <article class="warning warning-warning">
+            <span>⚠️</span>
+            <div>
+              <h3>TEST INTEGRITY WARNING</h3>
+              <p>
+                Passing results from changed pre-existing tests should not be treated as
+                fully independent proof.
+              </p>
+              <code>test/password.test.js</code>
+            </div>
+          </article>
+          <article class="warning warning-high">
+            <span>🚨</span>
+            <div>
+              <h3>HIGH-RISK OUT-OF-SCOPE CHANGE</h3>
+              <p>A password minimum appears to decrease from 12 to 6.</p>
+              <code>src/auth/password.js</code>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="limitations">
+        <div>
+          <div class="eyebrow">Honest limits</div>
+          <h2>What this report does not prove</h2>
+        </div>
+        <ul>
+          <li>Passing generic checks does not prove every requested behavior.</li>
+          <li>Scope and sensitive-change classification uses conservative heuristics.</li>
+          <li>Approved checks execute repository code without an isolation sandbox.</li>
+          <li>Secret redaction is heuristic and may not identify every credential.</li>
+        </ul>
+      </section>
+      <footer>
+        <span>TaskWitness 0.1.0</span><span>No evidence = no green check.</span>
+      </footer>
+    </main>
+  </body>
+</html>

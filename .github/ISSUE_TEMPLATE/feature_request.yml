@@ -1,0 +1,37 @@
+name: Feature request
+description: Propose a concrete verification workflow or evidence adapter.
+title: 'feature: '
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow
+      description: What task are you trying to verify, and where does the current workflow stop?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Independent evidence
+      description: What observable fact would genuinely prove the behavior?
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Trust and execution risks
+      description: Note commands, credentials, network access, or untrusted input involved.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help implement or test this.

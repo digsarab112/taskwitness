@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.test-dist/
+coverage/
+*.log
+.DS_Store
+.taskwitness/
+demo/output/

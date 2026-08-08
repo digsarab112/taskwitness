@@ -1,0 +1,53 @@
+name: Bug report
+description: Report reproducible incorrect behavior or an unsafe verification result.
+title: 'bug: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve TaskWitness. Do not include secrets or undisclosed security vulnerabilities here; use the private security advisory form instead.
+  - type: input
+    id: version
+    attributes:
+      label: TaskWitness version
+      placeholder: 0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Node 22, Git 2.51, Ubuntu 24.04
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Include the expected result and the actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use a disposable repository when possible.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant evidence
+      description: Paste redacted terminal output or a minimal Proof Pack excerpt.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed credentials, private source code, and other sensitive data.
+          required: true
+        - label: This is not an undisclosed security vulnerability.
+          required: true

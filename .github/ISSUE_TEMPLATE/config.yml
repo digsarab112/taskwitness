@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question
+    url: https://github.com/digsarab112/taskwitness/discussions
+    about: Use Discussions for setup help and open-ended design questions.
+  - name: Report a vulnerability privately
+    url: https://github.com/digsarab112/taskwitness/security/advisories/new
+    about: Never publish exploit details or secrets in a public issue.
