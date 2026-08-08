@@ -60,6 +60,18 @@ npm install --global taskwitness
 taskwitness doctor
 ```
 
+To pin the release or install the same tarball directly from GitHub:
+
+```bash
+npm install --global taskwitness@0.1.1
+# Registry-independent fallback:
+npm install --global https://github.com/digsarab112/taskwitness/releases/download/v0.1.1/taskwitness-0.1.1.tgz
+```
+
+Each [GitHub Release](https://github.com/digsarab112/taskwitness/releases) includes the npm
+tarball, a CycloneDX SBOM, and `SHA256SUMS`. The release workflow attests the tarball, and the npm
+workflow verifies and publishes that exact asset with provenance.
+
 Or install the current source checkout:
 
 ```bash
@@ -269,5 +281,6 @@ commercial and open-source use.
 - Review the [contribution guide](CONTRIBUTING.md), [security policy](SECURITY.md), and
   [code of conduct](CODE_OF_CONDUCT.md) before participating.
 
-For release engineering, use the [public release checklist](docs/publishing-checklist.md). npm
-ownership and package publishing remain separate from the GitHub source release.
+For release engineering, use the [public release checklist](docs/publishing-checklist.md) and the
+[signed-tag setup](docs/signing-tags.md). npm ownership and package publishing remain separate from
+the GitHub source release.

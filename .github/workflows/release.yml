@@ -10,6 +10,10 @@ permissions:
   id-token: write
   attestations: write
 
+concurrency:
+  group: github-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -19,8 +23,10 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
+      - name: Use the audited npm release toolchain
+        run: npm install --global npm@11.19.0
       - name: Require a cryptographically verified annotated tag
         env:
           GH_TOKEN: ${{ github.token }}
@@ -34,6 +40,12 @@ jobs:
           verified="$(gh api "repos/${GITHUB_REPOSITORY}/git/tags/${tag_sha}" --jq '.verification.verified')"
           if [ "$verified" != "true" ]; then
             echo "GitHub could not verify the tag signature."
+            exit 1
+          fi
+          tag_commit="$(git rev-parse "${GITHUB_REF_NAME}^{commit}")"
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor "$tag_commit" origin/main; then
+            echo "Release tags must point to a commit contained in main."
             exit 1
           fi
       - run: npm ci
@@ -50,6 +62,7 @@ jobs:
         run: |
           npm pack
           npm sbom --sbom-format=cyclonedx > taskwitness-sbom.cdx.json
+          sha256sum taskwitness-*.tgz taskwitness-sbom.cdx.json > SHA256SUMS
       - name: Attest package provenance
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
@@ -58,7 +71,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
-          gh release create "$GITHUB_REF_NAME" taskwitness-*.tgz taskwitness-sbom.cdx.json
+          gh release create "$GITHUB_REF_NAME" taskwitness-*.tgz taskwitness-sbom.cdx.json SHA256SUMS
           --title "TaskWitness $GITHUB_REF_NAME"
           --generate-notes
           --verify-tag
