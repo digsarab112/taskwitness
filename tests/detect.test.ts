@@ -33,6 +33,28 @@ describe('ecosystem check detection', () => {
     );
   });
 
+  it('uses Yarn commands when yarn.lock is present', async () => {
+    root = await createNodeFixture('yarn.lock', '# yarn lockfile v1\n');
+
+    const checks = await detectChecks(root, 1_000);
+
+    assert.deepEqual(
+      checks.map((check) => check.command),
+      ['yarn test', 'yarn build', 'yarn lint', 'yarn typecheck'],
+    );
+  });
+
+  it('uses Bun commands when bun.lock is present', async () => {
+    root = await createNodeFixture('bun.lock', '{}\n');
+
+    const checks = await detectChecks(root, 1_000);
+
+    assert.deepEqual(
+      checks.map((check) => check.command),
+      ['bun test', 'bun build', 'bun lint', 'bun typecheck'],
+    );
+  });
+
   it('detects Python pytest, Ruff, mypy, and build configuration', async () => {
     root = await mkdtemp(path.join(tmpdir(), 'taskwitness-python-'));
     await mkdir(path.join(root, 'tests'));
@@ -53,3 +75,21 @@ describe('ecosystem check detection', () => {
     );
   });
 });
+
+async function createNodeFixture(lockfile: string, contents: string): Promise<string> {
+  const root = await mkdtemp(path.join(tmpdir(), 'taskwitness-detect-'));
+  await writeFile(path.join(root, lockfile), contents, 'utf8');
+  await writeFile(
+    path.join(root, 'package.json'),
+    JSON.stringify({
+      scripts: {
+        test: 'node --test',
+        build: 'tsc',
+        lint: 'eslint .',
+        typecheck: 'tsc --noEmit',
+      },
+    }),
+    'utf8',
+  );
+  return root;
+}
