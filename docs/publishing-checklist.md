@@ -1,7 +1,7 @@
 # Public release checklist
 
-The source and npm payload are technically ready, but public ownership and release controls require
-human decisions. Do not announce 0.1.0 until every blocking item is complete.
+The GitHub source is public and technically verified. Complete every unchecked npm and signing
+control before publishing the package to the npm registry.
 
 ## Blocking ownership items
 
@@ -16,7 +16,8 @@ human decisions. Do not announce 0.1.0 until every blocking item is complete.
 ## Release security
 
 - [ ] Require npm two-factor authentication or configure npm trusted publishing with GitHub Actions.
-- [ ] Protect the `main` branch and require the cross-platform CI job.
+- [x] Protect `main` with pull-request review, Code Owners, conversation resolution, CodeQL, and all
+      nine cross-platform CI jobs.
 - [x] Enable dependency update alerts and add automated Dependabot update configuration.
 - [x] Review `npm pack --dry-run` and install the exact tarball in a clean directory.
 - [x] Add a GitHub Release workflow that verifies a version tag and attaches the exact tarball.
@@ -34,6 +35,8 @@ npm pack --dry-run
 
 The CI matrix is configured for Node.js 20, 22, and 24 on Linux, macOS, and Windows. Local execution
 does not replace seeing all nine public CI jobs pass on the real repository.
+
+- [x] Confirm all nine CI jobs and CodeQL pass on the public repository.
 
 ## Suggested first publication
 
