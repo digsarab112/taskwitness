@@ -12,6 +12,8 @@ Releases use two linked workflows:
 Trusted Publishing can only be configured after the package exists on npm. For the first release:
 
 - [ ] Sign in to an npm account that has account-level 2FA enabled.
+- [ ] Complete the one-time [SSH tag-signing setup](signing-tags.md) and verify its disposable test
+      tag locally before preparing a release.
 - [ ] Confirm `npm view taskwitness` still returns `E404` immediately before publishing.
 - [ ] Create a short-lived granular npm access token allowed to publish the first version, with
       bypass 2FA enabled, and store it as the GitHub Actions secret `NPM_TOKEN`. Never paste it in
@@ -63,6 +65,7 @@ npm pack --dry-run
 - [ ] Wait for all required PR checks to pass.
 - [ ] Create an annotated, cryptographically signed tag matching the package version exactly.
 - [ ] Verify the npm provenance link, tarball, SBOM, and GitHub attestation after publication.
+- [ ] Verify `SHA256SUMS` against the tarball and SBOM downloaded from the GitHub Release.
 - [ ] Install from the public registry and smoke-test the executable:
 
 ```bash

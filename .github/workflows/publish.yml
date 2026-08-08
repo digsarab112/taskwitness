@@ -49,8 +49,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh attestation verify taskwitness-*.tgz --repo "$GITHUB_REPOSITORY"
       - name: Publish with provenance
-        run: npm publish taskwitness-*.tgz --access public --provenance
         env:
           # Needed only for the first publication. Delete the repository secret
           # after configuring npm Trusted Publishing for publish.yml.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "Using the short-lived bootstrap token for the first publication."
+          else
+            unset NODE_AUTH_TOKEN
+            echo "Using npm Trusted Publishing (OIDC)."
+          fi
+          npm publish taskwitness-*.tgz --access public --provenance

@@ -22,11 +22,14 @@ All notable changes are documented here. The project follows Semantic Versioning
   general scope and safety constraints.
 - Exercise the full adversarial CLI demo on every supported OS and Node.js CI combination.
 - Embed a favicon in standalone HTML reports so opening a report makes no missing-file request.
+- Lock Yarn and Bun package-manager detection down with portable command-display fixtures.
 
 ### Security
 
 - Add npm Trusted Publishing/provenance workflow support, signed-tag enforcement, release SBOMs,
   and GitHub artifact attestations.
+- Require release tags to come from `main` and publish SHA-256 checksums beside every release
+  tarball and SBOM.
 
 ## [0.1.0] - 2026-08-08
 
