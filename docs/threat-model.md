@@ -35,7 +35,7 @@ The relevant adversary may be malicious, compromised, or simply mistaken:
 - agent messages and future provider responses;
 - filenames and strings placed into reports.
 
-## Controls implemented in 0.1.0
+## Controls implemented in 0.1.1
 
 | Threat                          | Control                                                                                 |
 | ------------------------------- | --------------------------------------------------------------------------------------- |
@@ -43,7 +43,7 @@ The relevant adversary may be malicious, compromised, or simply mistaken:
 | Provider invents proof          | Schemas and evidence-reference validation reject nonexistent IDs.                       |
 | Prompt injection in source      | Repository text has no execution/write/policy capability.                               |
 | Silent arbitrary command        | Commands are displayed and approved; trusted commands require exact matching.           |
-| Shell injection                 | Checks use an argv vector with `shell: false`; shell operators are rejected.            |
+| Shell injection                 | Raw commands are parsed into argv; shell operators are rejected.                        |
 | Hung or noisy checks            | Timeout and per-stream output limits.                                                   |
 | Secret in logs/patch            | Common-pattern redaction before storage/rendering.                                      |
 | Green tests weakened by agent   | Modified/deleted/renamed pre-existing tests receive an integrity warning.               |
@@ -55,7 +55,7 @@ The relevant adversary may be malicious, compromised, or simply mistaken:
 ## Residual risk
 
 The largest Phase 1 risk is execution: repository checks are code and run with the user's current
-OS permissions. No timeout or `shell: false` setting prevents imported test code from reading files,
+OS permissions. No timeout or argv-based launcher prevents imported test code from reading files,
 using the network, or spawning its own processes. Isolation must be provided by the developer today.
 
 Scope classification, test-strength analysis, and secret detection are heuristics with known false

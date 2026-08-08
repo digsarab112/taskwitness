@@ -1,30 +1,55 @@
 # Public release checklist
 
-The GitHub source is public and technically verified. Complete every unchecked npm and signing
-control before publishing the package to the npm registry.
+Releases use two linked workflows:
 
-## Blocking ownership items
+1. A cryptographically signed tag runs `release.yml`, re-tests the package, creates a tarball and
+   CycloneDX SBOM, attests the tarball, and publishes the GitHub Release.
+2. The published GitHub Release runs `publish.yml`, re-tests the exact tag, verifies the GitHub
+   attestation, and publishes that same tarball to npm with provenance.
 
-- [x] Create the public GitHub repository and use `digsarab112/taskwitness` in package metadata and
-      documentation.
-- [ ] Reserve the unscoped `taskwitness` npm name. The public registry returned `E404 Not Found` on
-      2026-08-08, which suggests no public package currently occupies it, but availability is not a
-      reservation.
-- [x] Enable GitHub private vulnerability reporting and link it from `SECURITY.md`.
-- [x] Record `digsarab112` and TaskWitness contributors as the package maintainer identity.
+## One-time first publication
 
-## Release security
+Trusted Publishing can only be configured after the package exists on npm. For the first release:
 
-- [ ] Require npm two-factor authentication or configure npm trusted publishing with GitHub Actions.
-- [x] Protect `main` with pull-request review, Code Owners, conversation resolution, CodeQL, and all
-      nine cross-platform CI jobs.
-- [x] Enable dependency update alerts and add automated Dependabot update configuration.
-- [x] Review `npm pack --dry-run` and install the exact tarball in a clean directory.
-- [x] Add a GitHub Release workflow that verifies a version tag and attaches the exact tarball.
-- [ ] Configure npm trusted publishing and provenance before the first npm release.
-- [ ] Create and push a signed `v0.1.0` tag after the release commit is final.
+- [ ] Sign in to an npm account that has account-level 2FA enabled.
+- [ ] Confirm `npm view taskwitness` still returns `E404` immediately before publishing.
+- [ ] Create a short-lived granular npm access token allowed to publish the first version, with
+      bypass 2FA enabled, and store it as the GitHub Actions secret `NPM_TOKEN`. Never paste it in
+      an issue, pull request, command output, or chat.
+- [ ] Merge the release commit only after all Linux, macOS, and Windows checks pass.
+- [ ] Create and push the signed `v0.1.1` tag. GitHub must show the tag signature as **Verified**.
+- [ ] Confirm the GitHub Release and npm publish workflows succeed and npm shows provenance.
 
-## Technical verification
+The temporary token is used only as registry authorization for the first publication. The
+`id-token: write` permission and `--provenance` flag bind that publication to the GitHub workflow
+and source commit.
+
+## Switch to Trusted Publishing
+
+Once `taskwitness` exists on npm, use npm CLI 11.15 or newer while interactively signed in:
+
+```bash
+npm install --global npm@11.19.0
+npm login --auth-type=web
+npm trust github taskwitness \
+  --file publish.yml \
+  --repo digsarab112/taskwitness \
+  --allow-publish
+```
+
+Complete the npm 2FA challenge in the browser. Then:
+
+- [ ] Run `npm trust list taskwitness` and confirm it names `digsarab112/taskwitness` and
+      `publish.yml`.
+- [ ] Delete the GitHub Actions secret `NPM_TOKEN`.
+- [ ] In npm package settings, select **Require two-factor authentication and disallow tokens**.
+- [ ] Keep only `npm publish` allowed for the trusted publisher; do not grant staged-publish access
+      unless the release process intentionally adopts staging.
+
+Future releases authenticate with short-lived GitHub OIDC credentials and automatically receive
+npm provenance; no long-lived npm write token remains in GitHub.
+
+## Every release
 
 ```bash
 npm ci
@@ -33,19 +58,18 @@ npm run demo
 npm pack --dry-run
 ```
 
-The CI matrix is configured for Node.js 20, 22, and 24 on Linux, macOS, and Windows. Local execution
-does not replace seeing all nine public CI jobs pass on the real repository.
-
-- [x] Confirm all nine CI jobs and CodeQL pass on the public repository.
-
-## Suggested first publication
+- [ ] Update `package.json`, `package-lock.json`, `TASKWITNESS_VERSION`, and `CHANGELOG.md` together.
+- [ ] Verify a clean install of the packed tarball in a disposable directory.
+- [ ] Wait for all required PR checks to pass.
+- [ ] Create an annotated, cryptographically signed tag matching the package version exactly.
+- [ ] Verify the npm provenance link, tarball, SBOM, and GitHub attestation after publication.
+- [ ] Install from the public registry and smoke-test the executable:
 
 ```bash
-npm login
-npm publish --access public
-git tag -s v0.1.0 -m "TaskWitness 0.1.0"
-git push origin v0.1.0
+npm install --global taskwitness@0.1.1
+taskwitness --version
+taskwitness doctor
 ```
 
-Do not run these commands from an unreviewed working tree. Verify `npm whoami`, the package owner,
-the tarball contents, and the final Git commit first.
+Never move an existing release tag or reuse an npm version. If a release needs a fix, increment the
+version and create a new signed tag.

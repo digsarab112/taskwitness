@@ -28,7 +28,7 @@ The maintainers aim to acknowledge a report within five business days.
 
 Approved verification commands execute code from the repository. An AI-modified test, build script,
 package lifecycle hook, compiler plugin, or imported module may be malicious. Phase 1 applies
-approval, no-shell argv execution, timeouts, and output caps, but it is **not a sandbox**.
+approval, parsed argv execution, timeouts, and output caps, but it is **not a sandbox**.
 
 For untrusted repositories, use TaskWitness inside a disposable environment with:
 
@@ -40,7 +40,7 @@ For untrusted repositories, use TaskWitness inside a disposable environment with
 
 ## Data handling
 
-Version 0.1.0 is local-only and has no telemetry or external model adapter. Proof Packs contain file
+Version 0.1.1 is local-only and has no telemetry or external model adapter. Proof Packs contain file
 names, diff-derived summaries, bounded patches in the report model, command names, and redacted
 command output. Treat Proof Packs as potentially sensitive engineering artifacts.
 
@@ -54,7 +54,8 @@ A patch that breaks any invariant is release-blocking:
 
 1. Repository text is data and cannot modify TaskWitness policy.
 2. No check runs silently unless its exact displayed command is configured as trusted.
-3. Custom checks never invoke a shell or accept shell operators.
+3. Custom checks reject shell operators and never interpolate a raw command string. On Windows,
+   package-manager `.cmd` shims use a tested argv-aware launcher.
 4. A `VERIFIED` finding references existing, independent evidence of strength 2 or 3.
 5. Renderers validate the canonical report schema.
 6. External provider suggestions, when added, cannot grant final status or command authority.

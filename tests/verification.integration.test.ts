@@ -100,6 +100,72 @@ describe('verification analysis', () => {
     assert.equal(newRegression.verdict, 'VERIFICATION_FAILED');
   });
 
+  it('uses a clean complete diff as negative evidence for generic constraints', async () => {
+    fixture = await createTestRepository({
+      'src/feature.ts': 'export const feature = false;\n',
+    });
+    const repository = await GitRepository.open(fixture.root);
+    const baseline = await captureBaseline(repository, config, [
+      checkResult('test', 'failed'),
+    ]);
+    const contract = approvedContract('Implement feature behavior');
+    await fixture.write('src/feature.ts', 'export const feature = true;\n');
+    const after = await repository.createWorktreeTree();
+    const report = await analyzeVerification(
+      makeSession(contract, baseline),
+      repository,
+      after,
+      [checkResult('test', 'passed')],
+      config,
+    );
+
+    const constraint = report.requirements.find(
+      (finding) =>
+        contract.requirements.find(
+          (requirement) => requirement.id === finding.requirementId,
+        )?.kind === 'constraint',
+    );
+    assert.equal(constraint?.status, 'VERIFIED');
+    assert.equal(
+      constraint.evidenceIds.some((id) =>
+        report.evidence.some(
+          (record) => record.id === id && record.type === 'repository_state',
+        ),
+      ),
+      true,
+    );
+    assert.equal(report.verdict, 'VERIFIED');
+  });
+
+  it('uses clean scope evidence for a negative safety requirement', async () => {
+    fixture = await createTestRepository({
+      'src/auth/login.ts': 'export const login = false;\n',
+    });
+    const repository = await GitRepository.open(fixture.root);
+    const baseline = await captureBaseline(repository, config, [
+      checkResult('test', 'failed'),
+    ]);
+    const contract = approvedContract('Implement secure login behavior');
+    await fixture.write('src/auth/login.ts', 'export const login = true;\n');
+    const after = await repository.createWorktreeTree();
+    const report = await analyzeVerification(
+      makeSession(contract, baseline),
+      repository,
+      after,
+      [checkResult('test', 'passed')],
+      config,
+    );
+
+    const safetyRequirement = contract.requirements.find(
+      (requirement) => requirement.kind === 'safety',
+    );
+    const safetyFinding = report.requirements.find(
+      (finding) => finding.requirementId === safetyRequirement?.id,
+    );
+    assert.equal(safetyFinding?.status, 'VERIFIED');
+    assert.equal(report.verdict, 'VERIFIED');
+  });
+
   it('treats prompt injection inside source as untrusted data', async () => {
     fixture = await createTestRepository({ 'src/app.ts': 'export const app = true;\n' });
     const repository = await GitRepository.open(fixture.root);

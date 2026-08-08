@@ -1,6 +1,6 @@
 {
   "name": "taskwitness",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Evidence-backed completion reports for AI coding agents.",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,7 +12,7 @@
     }
   },
   "bin": {
-    "taskwitness": "./dist/cli.js"
+    "taskwitness": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -37,10 +37,15 @@
   "keywords": [
     "ai",
     "coding-agent",
+    "ai-agent",
     "verification",
     "git",
     "cli",
-    "evidence"
+    "evidence",
+    "ci",
+    "code-review",
+    "security",
+    "developer-tools"
   ],
   "author": {
     "name": "digsarab112 and TaskWitness contributors",
@@ -48,7 +53,8 @@
   },
   "license": "Apache-2.0",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "repository": {
     "type": "git",
@@ -63,12 +69,14 @@
   },
   "dependencies": {
     "commander": "^14.0.0",
+    "cross-spawn": "^7.0.6",
     "picocolors": "^1.1.1",
     "yaml": "^2.8.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^24.2.1",
+    "@types/cross-spawn": "^6.0.6",
     "eslint": "^9.33.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",

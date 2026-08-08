@@ -1,6 +1,8 @@
 # TaskWitness
 
 [![CI](https://github.com/digsarab112/taskwitness/actions/workflows/ci.yml/badge.svg)](https://github.com/digsarab112/taskwitness/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/taskwitness.svg?logo=npm)](https://www.npmjs.com/package/taskwitness)
+[![npm downloads](https://img.shields.io/npm/dm/taskwitness.svg?logo=npm)](https://www.npmjs.com/package/taskwitness)
 [![Node.js 20+](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/digsarab112/taskwitness?style=social)](https://github.com/digsarab112/taskwitness/stargazers)
@@ -49,10 +51,16 @@ The core rule is deliberately strict:
 
 > **No evidence = no green check.**
 
-## Install from source
+## Install
 
-TaskWitness 0.1.0 is prepared for npm publication but is not assumed to be published yet.
-Use these commands today:
+Install the public CLI globally:
+
+```bash
+npm install --global taskwitness
+taskwitness doctor
+```
+
+Or install the current source checkout:
 
 ```bash
 git clone https://github.com/digsarab112/taskwitness.git
@@ -61,12 +69,6 @@ npm ci
 npm run build
 npm link
 taskwitness doctor
-```
-
-After the package is published, installation becomes:
-
-```bash
-npm install --global taskwitness
 ```
 
 Requirements: Node.js 20 or newer and Git.
@@ -168,8 +170,11 @@ taskwitness report --markdown
 taskwitness report --html
 ```
 
-Custom commands are parsed into an argument vector and executed without a shell. Operators such
-as `&&`, `;`, pipes, and redirects are rejected.
+Custom commands are parsed into an argument vector rather than interpolated into a shell command
+string. Operators such as `&&`, `;`, pipes, and redirects are rejected.
+
+`taskwitness verify` is CI-safe: it exits with `0` only for `VERIFIED`, `1` for
+`VERIFICATION_FAILED`, and `2` for `NEEDS_REVIEW` or `INSUFFICIENT_EVIDENCE`.
 
 ## Configuration
 
@@ -196,7 +201,8 @@ Running a test still executes repository code. TaskWitness therefore:
 
 - shows detected commands before execution;
 - requires approval unless a command is explicitly trusted;
-- never uses a shell for checks;
+- never interpolates a raw user command into a shell; Windows package-manager shims are resolved
+  and escaped by a cross-platform argv launcher;
 - applies timeouts and output caps;
 - redacts common secret patterns from stored logs;
 - aborts if an approved check changes a non-ignored repository file.
@@ -207,7 +213,7 @@ container when the repository is not trusted. Read [SECURITY.md](SECURITY.md) an
 
 ## Honest limitations
 
-- Task Contract generation and scope mapping are conservative heuristics in 0.1.0.
+- Task Contract generation and scope mapping are conservative heuristics in 0.1.1.
 - A passing command proves only what that command genuinely exercises.
 - Test-weakening detection is intentionally limited; Phase 1 reliably reports changed old tests
   but cannot prove that every assertion is strong.
@@ -216,7 +222,7 @@ container when the repository is not trusted. Read [SECURITY.md](SECURITY.md) an
   change the working tree, index, commits, or branches.
 - Browser flows, API behavioral verification, isolated runners, vulnerability scanners, and signed
   Proof Packs are roadmap work.
-- The provider interface exists, but 0.1.0 intentionally ships deterministic analysis only.
+- The provider interface exists, but 0.1.1 intentionally ships deterministic analysis only.
 
 ## Architecture
 

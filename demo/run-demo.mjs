@@ -71,7 +71,7 @@ await write(
   ].join('\n'),
 );
 
-await runCli(['verify', '--yes']);
+await runCli(['verify', '--yes'], 1);
 
 const sessionId = (
   await readFile(path.join(repositoryRoot, '.taskwitness', 'current'), 'utf8')
@@ -92,11 +92,34 @@ async function git(...args) {
   await execFileAsync('git', args, { cwd: repositoryRoot });
 }
 
-async function runCli(args) {
-  const result = await execFileAsync(process.execPath, [cliPath, ...args], {
-    cwd: repositoryRoot,
-    encoding: 'utf8',
-  });
-  process.stdout.write(result.stdout);
-  process.stderr.write(result.stderr);
+async function runCli(args, expectedExitCode = 0) {
+  try {
+    const result = await execFileAsync(process.execPath, [cliPath, ...args], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+    });
+    process.stdout.write(result.stdout);
+    process.stderr.write(result.stderr);
+    if (expectedExitCode !== 0) {
+      throw new Error(
+        `Expected TaskWitness to exit with ${expectedExitCode}, but it exited with 0.`,
+      );
+    }
+  } catch (error) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === expectedExitCode
+    ) {
+      if ('stdout' in error && typeof error.stdout === 'string') {
+        process.stdout.write(error.stdout);
+      }
+      if ('stderr' in error && typeof error.stderr === 'string') {
+        process.stderr.write(error.stderr);
+      }
+      return;
+    }
+    throw error;
+  }
 }

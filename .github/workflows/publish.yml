@@ -1,0 +1,56 @@
+name: Publish npm Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Use an npm CLI with Trusted Publishing support
+        run: npm install --global npm@11.19.0
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm audit signatures
+      - run: npm run check
+      - name: Require release tag and package versions to match
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: >-
+          node --input-type=module -e
+          "import packageJson from './package.json' with { type: 'json' };
+          if ('v' + packageJson.version !== process.env.RELEASE_TAG)
+          throw new Error('Release tag must equal v' + packageJson.version);"
+      - run: npm pack --dry-run
+      - name: Download the attested GitHub Release package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release download "$RELEASE_TAG" --pattern 'taskwitness-*.tgz'
+      - name: Verify the GitHub artifact attestation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh attestation verify taskwitness-*.tgz --repo "$GITHUB_REPOSITORY"
+      - name: Publish with provenance
+        run: npm publish taskwitness-*.tgz --access public --provenance
+        env:
+          # Needed only for the first publication. Delete the repository secret
+          # after configuring npm Trusted Publishing for publish.yml.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
