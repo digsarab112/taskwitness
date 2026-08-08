@@ -24,7 +24,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build:test && node --test .test-dist/tests/*.test.js",
+    "test": "npm run build:test && node .test-dist/scripts/run-tests.js",
     "build:test": "tsc -p tsconfig.test.json",
     "demo": "npm run build && node demo/run-demo.mjs",
     "lint": "eslint .",

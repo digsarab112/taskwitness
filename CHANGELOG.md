@@ -24,4 +24,5 @@ All notable changes are documented here. The project follows Semantic Versioning
 - Evidence records with stable IDs and proof-strength enforcement.
 - Terminal, JSON, Markdown, and standalone HTML Proof Packs.
 - Cross-platform process/path handling and disposable Git integration fixtures.
+- A shell-independent test launcher for consistent CI behavior on Windows, macOS, and Linux.
 - A reproducible adversarial demo and local-first security model.
