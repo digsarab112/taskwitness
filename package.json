@@ -25,6 +25,7 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "npm run build:test && node .test-dist/scripts/run-tests.js",
+    "test:package": "npm run build:test && node .test-dist/scripts/package-smoke.js",
     "build:test": "tsc -p tsconfig.test.json",
     "demo": "npm run build && node demo/run-demo.mjs",
     "lint": "eslint .",
@@ -32,7 +33,7 @@
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "prepack": "npm run build",
-    "prepublishOnly": "npm run check"
+    "prepublishOnly": "npm run check && npm run test:package"
   },
   "keywords": [
     "ai",
@@ -65,21 +66,22 @@
   },
   "homepage": "https://github.com/digsarab112/taskwitness#readme",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   },
   "dependencies": {
-    "commander": "^14.0.0",
+    "commander": "^14.0.3",
     "cross-spawn": "^7.0.6",
     "picocolors": "^1.1.1",
     "yaml": "^2.8.1",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "^24.2.1",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.19.43",
     "@types/cross-spawn": "^6.0.6",
-    "eslint": "^9.33.0",
+    "eslint": "^10.8.1",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.39.1"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.66.0"
   }
 }

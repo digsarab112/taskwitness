@@ -35,7 +35,7 @@ export const TaskContractSchema = z.object({
   ambiguous: z.boolean(),
   ambiguityReasons: z.array(z.string()),
   requirements: z.array(RequirementSchema).max(6),
-  approvedAt: z.string().datetime().nullable(),
+  approvedAt: z.iso.datetime().nullable(),
   generator: z.enum(['deterministic', 'provider-assisted']),
 });
 
@@ -68,7 +68,7 @@ export const CheckResultSchema = z.object({
       skipped: z.number().int().nonnegative().optional(),
     })
     .optional(),
-  startedAt: z.string().datetime(),
+  startedAt: z.iso.datetime(),
 });
 
 export const FileSnapshotSchema = z.object({
@@ -95,7 +95,7 @@ export const BaselineSchema = z.object({
   dependencyFiles: z.array(z.string()),
   checks: z.array(CheckDefinitionSchema),
   checkResults: z.array(CheckResultSchema),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
   taskWitnessVersion: z.string(),
 });
 
@@ -104,8 +104,8 @@ export const SessionSchema = z.object({
   id: z.string(),
   contract: TaskContractSchema,
   baseline: BaselineSchema,
-  createdAt: z.string().datetime(),
-  completedAt: z.string().datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  completedAt: z.iso.datetime().nullable(),
 });
 
 export const EvidenceTypeSchema = z.enum([
@@ -127,10 +127,10 @@ export const EvidenceRecordSchema = z.object({
   result: z.enum(['passed', 'failed', 'warning', 'informational']),
   strength: ProofStrengthSchema,
   summary: z.string().min(1),
-  details: z.record(z.unknown()).default({}),
+  details: z.record(z.string(), z.unknown()).default({}),
   relatedFiles: z.array(z.string()).default([]),
   independent: z.boolean().default(true),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
 });
 
 export const FileChangeSchema = z.object({
@@ -196,7 +196,7 @@ export const VerificationReportSchema = z.object({
   verificationChecks: z.array(CheckResultSchema),
   evidence: z.array(EvidenceRecordSchema),
   warnings: z.array(WarningSchema),
-  generatedAt: z.string().datetime(),
+  generatedAt: z.iso.datetime(),
   taskWitnessVersion: z.string(),
   repository: z.object({
     root: z.string(),

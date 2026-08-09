@@ -38,6 +38,15 @@ describe('CLI workflow', () => {
       '--yes',
     ]);
     assert.equal(start.exitCode, 0, start.stderr);
+    assert.match(start.stdout, /Repository prepared for TaskWitness/u);
+    assert.match(
+      await readFile(path.join(fixture.root, '.gitignore'), 'utf8'),
+      /\.taskwitness\//u,
+    );
+    assert.match(
+      await readFile(path.join(fixture.root, '.taskwitness.yml'), 'utf8'),
+      /version: 1/u,
+    );
 
     await fixture.write('src/feature.js', 'export const feature = true;\n');
     const verify = await runCli(fixture.root, ['verify', '--yes']);

@@ -29,7 +29,7 @@ async function detectNodeChecks(
   try {
     packageJson = JSON.parse(await readFile(packagePath, 'utf8')) as PackageJson;
   } catch (error) {
-    throw new Error(`Cannot parse package.json: ${formatError(error)}`);
+    throw new Error(`Cannot parse package.json: ${formatError(error)}`, { cause: error });
   }
 
   const packageManager = await detectPackageManager(root);

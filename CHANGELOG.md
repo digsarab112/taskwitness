@@ -5,6 +5,20 @@ All notable changes are documented here. The project follows Semantic Versioning
 
 ## [Unreleased]
 
+### Changed
+
+- Make `start` initialize TaskWitness automatically, reducing first use to one command.
+- Migrate runtime validation to Zod 4 and the supported TypeScript 6 / ESLint 10 toolchain.
+- Compile against Node.js 20 type definitions so newer runtime-only APIs cannot slip into builds.
+- Set the minimum runtime to Node.js 20.19 and cover Node.js 26 in the cross-platform matrix.
+- Keep compatible patch/minor dependency updates grouped while isolating or deferring intentional
+  major-version migrations.
+
+### Fixed
+
+- Test the packed, globally installed CLI end to end on every supported OS and Node.js CI entry.
+- Stop displaying npm badges and installation commands before the public package exists.
+
 ### Planned
 
 - Isolated check runners.

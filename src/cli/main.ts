@@ -24,7 +24,7 @@ import { renderMarkdownReport } from '../reports/markdown.js';
 import { renderTerminalReport } from '../reports/terminal.js';
 import { initializeRepository } from '../session/init.js';
 import { SessionStore } from '../session/store.js';
-import { isNodeError, readJson } from '../utils/fs.js';
+import { isNodeError, pathExists, readJson } from '../utils/fs.js';
 import { shellDisplay } from '../utils/text.js';
 import { confirm } from './prompt.js';
 import { renderChecks, renderContract } from './presentation.js';
@@ -52,16 +52,27 @@ export async function runCli(argv: readonly string[]): Promise<void> {
     .name('taskwitness')
     .description('Evidence-backed completion reports for coding-agent work.')
     .version(TASKWITNESS_VERSION)
-    .showSuggestionAfterError();
+    .showSuggestionAfterError()
+    .addHelpText(
+      'after',
+      [
+        '',
+        'Quick start:',
+        '  taskwitness start "Add dark mode without changing existing behavior"',
+        '  # Let your coding agent work, then:',
+        '  taskwitness verify',
+        '',
+      ].join('\n'),
+    );
 
   program
     .command('init')
-    .description('Prepare TaskWitness configuration and Git ignores.')
+    .description('Prepare configuration explicitly (start also does this automatically).')
     .action(async () => runInit());
 
   program
     .command('start')
-    .description('Capture a baseline and approve a Task Contract.')
+    .description('Initialize, capture a baseline, and approve a Task Contract.')
     .argument('<task>', 'The concrete task given to a coding agent.')
     .option('-y, --yes', 'Approve the generated contract and detected checks.', false)
     .option('--no-baseline-checks', 'Do not run detected checks at baseline.')
@@ -117,7 +128,6 @@ async function runInit(): Promise<void> {
 
 async function runStart(task: string, options: StartOptions): Promise<void> {
   const repository = await GitRepository.open(process.cwd());
-  const config = await loadConfig(repository.root);
   const store = new SessionStore(repository.root);
   const contract = generateTaskContract(task);
   console.log(renderContract(contract));
@@ -128,6 +138,15 @@ async function runStart(task: string, options: StartOptions): Promise<void> {
 
   await guardExistingSession(store, options.yes);
   const approvedContract = await approveContract(contract, options.yes);
+  const initResult = await initializeRepository(repository.root);
+  await repository.ensureRuntimeExcluded();
+  if (initResult.configCreated || initResult.gitignoreUpdated) {
+    console.log(pc.green('✓ Repository prepared for TaskWitness.'));
+    if (initResult.configCreated) console.log(`  Created .taskwitness.yml`);
+    if (initResult.gitignoreUpdated) console.log(`  Added .taskwitness/ to .gitignore`);
+    console.log('');
+  }
+  const config = await loadConfig(repository.root);
   const baseline = await captureBaseline(repository, config, []);
   let checkResults: CheckResult[] = [];
   if (options.baselineChecks && baseline.checks.length > 0) {
@@ -243,6 +262,7 @@ async function runReport(options: ReportOptions): Promise<void> {
     if (isNodeError(error) && error.code === 'ENOENT') {
       throw new Error(
         'No report exists for the active session. Run taskwitness verify first.',
+        { cause: error },
       );
     }
     throw error;
@@ -261,8 +281,13 @@ async function runDoctor(): Promise<void> {
   try {
     const repository = await GitRepository.open(process.cwd());
     console.log(`✓ Git repository ${repository.root}`);
+    const initialized = await pathExists(path.join(repository.root, '.taskwitness.yml'));
     const config = await loadConfig(repository.root);
-    console.log('✓ Configuration valid');
+    console.log(
+      initialized
+        ? '✓ Configuration valid'
+        : '○ No .taskwitness.yml yet (start will create it automatically)',
+    );
     const baseline = await captureBaseline(repository, config, []);
     console.log(`✓ Snapshot capture ${baseline.tree.slice(0, 12)}`);
     if (baseline.checks.length === 0) console.log('○ No Node.js or Python checks detected');

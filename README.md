@@ -1,9 +1,7 @@
 # TaskWitness
 
 [![CI](https://github.com/digsarab112/taskwitness/actions/workflows/ci.yml/badge.svg)](https://github.com/digsarab112/taskwitness/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/taskwitness.svg?logo=npm)](https://www.npmjs.com/package/taskwitness)
-[![npm downloads](https://img.shields.io/npm/dm/taskwitness.svg?logo=npm)](https://www.npmjs.com/package/taskwitness)
-[![Node.js 20+](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Node.js 20.19+](https://img.shields.io/badge/Node.js-20.19%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/digsarab112/taskwitness?style=social)](https://github.com/digsarab112/taskwitness/stargazers)
 
@@ -53,26 +51,7 @@ The core rule is deliberately strict:
 
 ## Install
 
-Install the public CLI globally:
-
-```bash
-npm install --global taskwitness
-taskwitness doctor
-```
-
-To pin the release or install the same tarball directly from GitHub:
-
-```bash
-npm install --global taskwitness@0.1.1
-# Registry-independent fallback:
-npm install --global https://github.com/digsarab112/taskwitness/releases/download/v0.1.1/taskwitness-0.1.1.tgz
-```
-
-Each [GitHub Release](https://github.com/digsarab112/taskwitness/releases) includes the npm
-tarball, a CycloneDX SBOM, and `SHA256SUMS`. The release workflow attests the tarball, and the npm
-workflow verifies and publishes that exact asset with provenance.
-
-Or install the current source checkout:
+The public package has not been published yet. To try the current source safely:
 
 ```bash
 git clone https://github.com/digsarab112/taskwitness.git
@@ -80,17 +59,28 @@ cd taskwitness
 npm ci
 npm run build
 npm link
+taskwitness --version
 taskwitness doctor
 ```
 
-Requirements: Node.js 20 or newer and Git.
+After the public release, installation becomes:
+
+```bash
+npm install --global taskwitness
+```
+
+Each future [GitHub Release](https://github.com/digsarab112/taskwitness/releases) will include the
+npm tarball, a CycloneDX SBOM, and `SHA256SUMS`. The release workflow attests the tarball, and the
+npm workflow verifies and publishes that exact asset with provenance.
+
+Requirements: Node.js 20.19 or newer and Git.
 
 ## Two-minute workflow
 
-Enter the repository where an agent will work:
+Enter the repository where an agent will work. `start` prepares `.taskwitness.yml` and
+`.gitignore` automatically, so the explicit `init` step is optional:
 
 ```bash
-taskwitness init
 taskwitness start "Add dark mode and persist the preference after refresh"
 ```
 
@@ -201,7 +191,7 @@ checkTimeoutMs: 120000
 ```
 
 Trusted commands can run without another prompt. Only trust commands you would execute yourself.
-Session data and Proof Packs live in `.taskwitness/`, which `init` adds to `.gitignore`.
+Session data and Proof Packs live in `.taskwitness/`, which `start` or `init` adds to `.gitignore`.
 
 ## Security model
 
@@ -265,7 +255,7 @@ CLI.
 npm ci
 npm run check
 npm run demo
-npm pack --dry-run
+npm run test:package
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). TaskWitness uses Apache-2.0 rather than MIT because its

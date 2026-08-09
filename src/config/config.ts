@@ -27,7 +27,9 @@ export async function loadConfig(repositoryRoot: string): Promise<TaskWitnessCon
     return ConfigSchema.parse(parsed ?? {});
   } catch (error) {
     if (isNodeError(error) && error.code === 'ENOENT') return ConfigSchema.parse({});
-    throw new Error(`Cannot load ${CONFIG_FILENAME}: ${formatError(error)}`);
+    throw new Error(`Cannot load ${CONFIG_FILENAME}: ${formatError(error)}`, {
+      cause: error,
+    });
   }
 }
 
