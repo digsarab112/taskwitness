@@ -221,7 +221,7 @@ container when the repository is not trusted. Read [SECURITY.md](SECURITY.md) an
 
 ## Honest limitations
 
-- Task Contract generation and scope mapping are conservative heuristics in 0.1.1.
+- Task Contract generation and scope mapping are conservative heuristics in 0.1.2.
 - A passing command proves only what that command genuinely exercises.
 - Test-weakening detection is intentionally limited; Phase 1 reliably reports changed old tests
   but cannot prove that every assertion is strong.
@@ -230,7 +230,7 @@ container when the repository is not trusted. Read [SECURITY.md](SECURITY.md) an
   change the working tree, index, commits, or branches.
 - Browser flows, API behavioral verification, isolated runners, vulnerability scanners, and signed
   Proof Packs are roadmap work.
-- The provider interface exists, but 0.1.1 intentionally ships deterministic analysis only.
+- The provider interface exists, but 0.1.2 intentionally ships deterministic analysis only.
 
 ## Architecture
 

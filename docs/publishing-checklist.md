@@ -49,6 +49,8 @@ Complete the npm 2FA challenge in the browser. Then:
 - [ ] Run `npm trust list taskwitness` and confirm it names `digsarab112/taskwitness` and
       `publish.yml`.
 - [ ] Delete the GitHub Actions secret `NPM_TOKEN`.
+- [ ] Confirm `publish.yml` has no `secrets.NPM_TOKEN` fallback and explicitly requires GitHub OIDC
+      credentials before `npm publish`.
 - [ ] In npm package settings, select **Require two-factor authentication and disallow tokens**.
 - [ ] Keep only `npm publish` allowed for the trusted publisher; do not grant staged-publish access
       unless the release process intentionally adopts staging.
@@ -74,7 +76,7 @@ npm pack --dry-run
 - [ ] Install from the public registry and smoke-test the executable:
 
 ```bash
-npm install --global taskwitness@0.1.1
+npm install --global taskwitness@latest
 taskwitness --version
 taskwitness doctor
 ```

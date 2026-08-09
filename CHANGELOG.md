@@ -5,16 +5,25 @@ All notable changes are documented here. The project follows Semantic Versioning
 
 ## [Unreleased]
 
-### Fixed
-
-- Dispatch npm publication explicitly after creating a GitHub Release, because events created by
-  the repository `GITHUB_TOKEN` do not start another workflow automatically.
-
 ### Planned
 
 - Isolated check runners.
 - Behavioral browser/API evidence adapters.
 - GitHub Action and pull-request reporting.
+
+## [0.1.2] - 2026-08-09
+
+### Fixed
+
+- Dispatch npm publication explicitly after creating a GitHub Release, because events created by
+  the repository `GITHUB_TOKEN` do not start another workflow automatically.
+
+### Security
+
+- Remove the stored-token fallback from npm publication and require short-lived GitHub OIDC
+  credentials for every release.
+- Add regression tests that reject a publish workflow wired to `secrets.NPM_TOKEN`, missing OIDC
+  permissions, or missing npm provenance.
 
 ## [0.1.1] - 2026-08-09
 
