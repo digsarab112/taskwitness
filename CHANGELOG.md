@@ -5,6 +5,14 @@ All notable changes are documented here. The project follows Semantic Versioning
 
 ## [Unreleased]
 
+### Planned
+
+- Isolated check runners.
+- Behavioral browser/API evidence adapters.
+- GitHub Action and pull-request reporting.
+
+## [0.1.1] - 2026-08-09
+
 ### Changed
 
 - Make `start` initialize TaskWitness automatically, reducing first use to one command.
@@ -13,19 +21,7 @@ All notable changes are documented here. The project follows Semantic Versioning
 - Set the minimum runtime to Node.js 20.19 and cover Node.js 26 in the cross-platform matrix.
 - Keep compatible patch/minor dependency updates grouped while isolating or deferring intentional
   major-version migrations.
-
-### Fixed
-
-- Test the packed, globally installed CLI end to end on every supported OS and Node.js CI entry.
-- Stop displaying npm badges and installation commands before the public package exists.
-
-### Planned
-
-- Isolated check runners.
-- Behavioral browser/API evidence adapters.
-- GitHub Action and pull-request reporting.
-
-## [0.1.1] - 2026-08-08
+- Publish direct npm installation instructions and verifiable GitHub Release fallback steps.
 
 ### Fixed
 
@@ -35,6 +31,7 @@ All notable changes are documented here. The project follows Semantic Versioning
 - Use a clean full diff, passing approved checks, and no regression as negative evidence for
   general scope and safety constraints.
 - Exercise the full adversarial CLI demo on every supported OS and Node.js CI combination.
+- Test the packed, globally installed CLI end to end on every supported OS and Node.js CI entry.
 - Embed a favicon in standalone HTML reports so opening a report makes no missing-file request.
 - Lock Yarn and Bun package-manager detection down with portable command-display fixtures.
 
