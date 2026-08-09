@@ -1,6 +1,8 @@
 # TaskWitness
 
 [![CI](https://github.com/digsarab112/taskwitness/actions/workflows/ci.yml/badge.svg)](https://github.com/digsarab112/taskwitness/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/taskwitness.svg)](https://www.npmjs.com/package/taskwitness)
+[![npm downloads](https://img.shields.io/npm/dm/taskwitness.svg)](https://www.npmjs.com/package/taskwitness)
 [![Node.js 20.19+](https://img.shields.io/badge/Node.js-20.19%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/digsarab112/taskwitness?style=social)](https://github.com/digsarab112/taskwitness/stargazers)
@@ -51,29 +53,33 @@ The core rule is deliberately strict:
 
 ## Install
 
-The public package has not been published yet. To try the current source safely:
+Requirements: Node.js 20.19 or newer and Git.
+
+Install the CLI from npm:
 
 ```bash
-git clone https://github.com/digsarab112/taskwitness.git
-cd taskwitness
-npm ci
-npm run build
-npm link
+npm install --global taskwitness
 taskwitness --version
 taskwitness doctor
 ```
 
-After the public release, installation becomes:
+Upgrade or remove it with the same package manager:
 
 ```bash
-npm install --global taskwitness
+npm install --global taskwitness@latest
+npm uninstall --global taskwitness
 ```
 
-Each future [GitHub Release](https://github.com/digsarab112/taskwitness/releases) will include the
-npm tarball, a CycloneDX SBOM, and `SHA256SUMS`. The release workflow attests the tarball, and the
-npm workflow verifies and publishes that exact asset with provenance.
+Prefer a release asset instead? Download `taskwitness-<version>.tgz` from
+[GitHub Releases](https://github.com/digsarab112/taskwitness/releases), verify it against
+`SHA256SUMS`, then install it directly:
 
-Requirements: Node.js 20.19 or newer and Git.
+```bash
+npm install --global ./taskwitness-<version>.tgz
+```
+
+Every GitHub Release includes the npm tarball, a CycloneDX SBOM, and `SHA256SUMS`. GitHub attests
+the tarball, and npm publishes that exact asset with provenance.
 
 ## Two-minute workflow
 
