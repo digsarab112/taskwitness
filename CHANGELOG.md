@@ -5,6 +5,11 @@ All notable changes are documented here. The project follows Semantic Versioning
 
 ## [Unreleased]
 
+### Fixed
+
+- Dispatch npm publication explicitly after creating a GitHub Release, because events created by
+  the repository `GITHUB_TOKEN` do not start another workflow automatically.
+
 ### Planned
 
 - Isolated check runners.
