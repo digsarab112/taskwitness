@@ -4,8 +4,10 @@ Releases use two linked workflows:
 
 1. A cryptographically signed tag runs `release.yml`, re-tests the package, creates a tarball and
    CycloneDX SBOM, attests the tarball, and publishes the GitHub Release.
-2. The published GitHub Release runs `publish.yml`, re-tests the exact tag, verifies the GitHub
-   attestation, and publishes that same tarball to npm with provenance.
+2. `release.yml` explicitly dispatches `publish.yml` after creating the GitHub Release. The second
+   workflow re-tests the exact tag, verifies its signature and GitHub attestation, and publishes
+   that same tarball to npm with provenance. An explicit dispatch is required because events made
+   with the repository `GITHUB_TOKEN` do not start another workflow automatically.
 
 ## One-time first publication
 
@@ -21,6 +23,9 @@ Trusted Publishing can only be configured after the package exists on npm. For t
 - [ ] Merge the release commit only after all Linux, macOS, and Windows checks pass.
 - [ ] Create and push the signed `v0.1.1` tag. GitHub must show the tag signature as **Verified**.
 - [ ] Confirm the GitHub Release and npm publish workflows succeed and npm shows provenance.
+- [ ] If publication must be recovered, dispatch `publish.yml` with the existing signed release
+      tag; its security gates still require a published Release, a Verified tag, and a commit in
+      `main`.
 
 The temporary token is used only as registry authorization for the first publication. The
 `id-token: write` permission and `--provenance` flag bind that publication to the GitHub workflow
