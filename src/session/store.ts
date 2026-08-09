@@ -60,7 +60,9 @@ export class SessionStore {
       id = (await readFile(this.currentPath, 'utf8')).trim();
     } catch (error) {
       if (isNodeError(error) && error.code === 'ENOENT') {
-        throw new Error('No active TaskWitness session. Run taskwitness start first.');
+        throw new Error('No active TaskWitness session. Run taskwitness start first.', {
+          cause: error,
+        });
       }
       throw error;
     }

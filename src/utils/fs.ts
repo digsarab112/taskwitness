@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { output, ZodTypeAny } from 'zod';
+import type { output, ZodType } from 'zod';
 
 export async function pathExists(filePath: string): Promise<boolean> {
   try {
@@ -33,13 +33,12 @@ export async function writeJsonAtomic(filePath: string, value: unknown): Promise
   await writeUtf8Atomic(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-export async function readJson<TSchema extends ZodTypeAny>(
+export async function readJson<TSchema extends ZodType>(
   filePath: string,
   schema: TSchema,
 ): Promise<output<TSchema>> {
   const raw: unknown = JSON.parse(await readUtf8(filePath));
-  const parsed = schema.parse(raw) as output<TSchema>;
-  return parsed;
+  return schema.parse(raw);
 }
 
 export function isNodeError(error: unknown): error is NodeJS.ErrnoException {

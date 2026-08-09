@@ -6,8 +6,31 @@ updates:
       interval: weekly
       day: monday
     groups:
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
       development-dependencies:
         dependency-type: development
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # TaskWitness supports Node.js 20, while Commander 15 requires 22.12+.
+      - dependency-name: commander
+        update-types:
+          - version-update:semver-major
+      # Compile against the oldest supported Node.js major so newer APIs cannot
+      # accidentally enter the runtime. Revisit this when Node 20 is removed.
+      - dependency-name: '@types/node'
+        update-types:
+          - version-update:semver-major
+      # typescript-eslint 8 currently supports TypeScript <6.1. Keep 6.x until
+      # its published peer range supports the next compiler major.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
     open-pull-requests-limit: 5
 
   - package-ecosystem: github-actions

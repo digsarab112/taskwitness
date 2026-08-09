@@ -12,7 +12,8 @@ npm ci
 npm run check
 ```
 
-Node.js 20+ and Git are required. The CI matrix covers macOS, Linux, and Windows.
+Node.js 20.19+ and Git are required. The CI matrix covers Node.js 20, 22, 24, and 26 on macOS,
+Linux, and Windows.
 
 ## Before opening a pull request
 
@@ -20,7 +21,7 @@ Node.js 20+ and Git are required. The CI matrix covers macOS, Linux, and Windows
 npm run format
 npm run check
 npm run demo
-npm pack --dry-run
+npm run test:package
 ```
 
 Describe:
